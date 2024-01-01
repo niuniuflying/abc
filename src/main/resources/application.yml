@@ -1,1 +1,53 @@
+#连接数据库
+spring:
+  datasource:
+    druid:
+      driver-class-name: com.mysql.cj.jdbc.Driver
+#      url: jdbc:mysql://localhost:3307/abc?useSSL=false&serverTimezone=UTC
+      url: jdbc:mysql:///aicampus?useSSL=false&serverTimezone=UTC
+      username: root
+      password: 123456
+
+  redis:
+    database: 0
+    host: localhost
+    port: 6380
+    password: 123456
+
+  mail:
+    host: smtp.qq.com
+    username: 84273140@qq.com
+    password: "akrlbcbmwvkrbjii"
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+file:
+  url: C:\\D\\file\\
+  size: 1048576
+
+
+#修改端口号
+server:
+  port: 80
+
+#控制台输出sql运行语句
+mybatis-plus:
+  #   用于指定主键 ID 的生成策略
+  #  id-type: auto 表示使用数据库自增策略，通常对应数据库中的自增主键（如 MySQL 的 AUTO_INCREMENT）
+  #  id-type: INPUT 表示用户输入，即手动设置主键值
+  #  id-type: ASSIGN_ID 表示使用雪花算法生成主键 ID
+  #  id-type: ASSIGN_UUID 表示使用 UUID 生成主键 ID
+  global-config:
+    db-config:
+      id-type: auto
+  #  日志输出
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+#     驼峰命名与下划线的转换
+    map-underscore-to-camel-case: false
+
 

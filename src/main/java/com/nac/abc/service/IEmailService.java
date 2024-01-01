@@ -1,5 +1,5 @@
 package com.nac.abc.service;
 
-public interface ISendMailService {
-    void sendCode(String email);
+public interface IEmailService {
+    void sendCode(String email,String code);
 }

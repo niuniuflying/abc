@@ -1,4 +1,5 @@
-package com.itheima.utils;
+/*
+package com.nac.abc.utils;
 
 import com.aliyun.oss.ClientException;
 import com.aliyun.oss.OSS;
@@ -65,3 +66,4 @@ public class AliOssUtil {
         return url;
     }
 }
+*/

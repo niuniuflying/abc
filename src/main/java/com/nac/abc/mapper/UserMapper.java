@@ -1,4 +1,4 @@
-package com.nac.abc.dao;
+package com.nac.abc.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.nac.abc.entity.User;
