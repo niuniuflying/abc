@@ -10,10 +10,12 @@ import com.nac.abc.service.IUserService;
 import com.nac.abc.utils.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
@@ -22,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("/user")
@@ -42,6 +45,9 @@ public class UserController {
     @Autowired
     private IEmailService iEmailService;
 
+    @Resource
+    private StringRedisTemplate stringRedisTemplate;
+
     //登录 把用户Id 和用户邮箱放入Token中 一并返回前端
     @GetMapping("/login")
     public Result<String> login(@RequestBody Map<String,Object> stringObjectMap) {
@@ -60,6 +66,9 @@ public class UserController {
             hashMap.put("email",user.getEmail());
             String token = JwtUtil.genToken(hashMap);
             System.out.println("登录生成的token："+token);
+            //把Token存入Redis
+            stringRedisTemplate.opsForValue().set(token,token,24, TimeUnit.HOURS);
+            //检擦是否为管理员
             String isAdmin = user.getIsAdmin();
             if (isAdmin.equals("1")){
                 return new Result<>(201, "管理员登录成功", token);
@@ -83,7 +92,7 @@ public class UserController {
 
     //邮箱发送验证码用于 忘记密码->重新设置修改密码
     @PutMapping("/updateUserPassword")
-    public Result<String> updateUserPassword(@RequestBody Map<String,Object> stringObjectMap){
+    public Result<String> updateUserPassword(@RequestBody Map<String,Object> stringObjectMap,@RequestHeader("Authorization") String token){
         String email = (String) stringObjectMap.get("email");
         String code = (String) stringObjectMap.get("code");
         String password = (String) stringObjectMap.get("password");
@@ -94,6 +103,7 @@ public class UserController {
             user.setPassword(md5Password);
             boolean updateUserPassword = iUserService.updateUserInfo(user);
             if (updateUserPassword){
+                stringRedisTemplate.opsForValue().getOperations().delete(token);
                 return new Result<>(200,"重置密码成功,返回登录页面",null);
             }else {
                 return new Result<>(500,"重置密码失败",null);
@@ -161,7 +171,7 @@ public class UserController {
 
     //修改个人信息 还可用于注销账号 即逻辑删除 修改isDelete改为1 其中修改密码较为特殊 要单独拎出来进行加密处理
     @PutMapping("/updateUserInfo")
-    public Result<User> updateUserInfo(@RequestBody Map<String,Object> stringObjectMap){
+    public Result<User> updateUserInfo(@RequestBody Map<String,Object> stringObjectMap,@RequestHeader("Authorization") String token){
         System.out.println("接收到的要修改的信息(必须包含此用户id）："+stringObjectMap);
         String string = JSON.toJSONString(stringObjectMap);
         User user = JSON.parseObject(string, User.class);
@@ -178,6 +188,7 @@ public class UserController {
             user.setPassword(md5Password);
             boolean updateUserInfo = iUserService.updateUserInfo(user);
             if (updateUserInfo){
+                stringRedisTemplate.opsForValue().getOperations().delete(token);
                 return new Result<>(200,"修改用户信息成功",null);
             }else {
                 return new Result<>(500,"修改用户信息失败",null);
