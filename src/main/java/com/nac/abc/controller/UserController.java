@@ -60,12 +60,17 @@ public class UserController {
             hashMap.put("email",user.getEmail());
             String token = JwtUtil.genToken(hashMap);
             System.out.println("登录生成的token："+token);
-            return new Result<>(200, "登录成功", token);
+            String isAdmin = user.getIsAdmin();
+            if (isAdmin.equals("1")){
+                return new Result<>(201, "管理员登录成功", token);
+            }else {
+                return new Result<>(200, "普通用户登录成功", token);
+            }
         }
         return new Result<>(500,"登录失败",null);
     }
 
-    //注册时发送的验证码并存到Redis
+    //注册时 忘记密码时 发送的验证码并存到Redis
     @PostMapping("/email/{email}")
     public Result<String> sendMailAndSetRedis(@PathVariable String email){
         String code = CodeUtils.code();
@@ -73,6 +78,30 @@ public class UserController {
         iEmailService.sendCode(email,code);
         iUserService.setRedisCode(email,code);
         return new Result<>(200,"发送验证码并存入Redis","success");
+    }
+
+
+    //邮箱发送验证码用于 忘记密码->重新设置修改密码
+    @PutMapping("/updateUserPassword")
+    public Result<String> updateUserPassword(@RequestBody Map<String,Object> stringObjectMap){
+        String email = (String) stringObjectMap.get("email");
+        String code = (String) stringObjectMap.get("code");
+        String password = (String) stringObjectMap.get("password");
+        String md5Password = Md5Util.getMD5String(password);
+        String selectCodeByEmail = iUserService.selectCodeByEmail(email);
+        if (code.equals(selectCodeByEmail)){
+            User user = iUserService.selectUserByEmail(email);
+            user.setPassword(md5Password);
+            boolean updateUserPassword = iUserService.updateUserInfo(user);
+            if (updateUserPassword){
+                return new Result<>(200,"重置密码成功,返回登录页面",null);
+            }else {
+                return new Result<>(500,"重置密码失败",null);
+            }
+        }else {
+            return new Result<>(500,"重置密码失败",null);
+        }
+
     }
 
     //注册
@@ -157,7 +186,7 @@ public class UserController {
     }
 
     //    上传头像
-    @GetMapping("avatarUpload")
+    @GetMapping("/avatarUpload")
     public Result<String> avatarUpload(@RequestParam("img") MultipartFile file) throws Exception {
         //size==1MB
         if (file.getSize()>size){
@@ -205,7 +234,7 @@ public class UserController {
     }
 
     //    展示图片
-    @GetMapping("avatarShow")
+    @GetMapping("/avatarShow")
     public Result<String> avatarShow(HttpServletResponse response) throws Exception {
         Map<String,Object> stringObjectMap = ThreadLocalUtil.get();
         String email = String.valueOf(stringObjectMap.get("email"));
@@ -222,7 +251,7 @@ public class UserController {
     }
 
     //    修改头像(先删除原有的头像及地址 再重新上传头像和地址）
-    @GetMapping("updateAvatar")
+    @PutMapping("/updateAvatar")
     public Result<String> updateAvatar(@RequestParam("img") MultipartFile file) throws Exception {
         Map<String,Object> stringObjectMap = ThreadLocalUtil.get();
         String email = String.valueOf(stringObjectMap.get("email"));
@@ -253,7 +282,7 @@ public class UserController {
     }
 
     //    下载图片
-    @GetMapping("downloadAvatar")
+    @GetMapping("/downloadAvatar")
     public Result<String> downloadAvatar(HttpServletResponse response)throws Exception{
         Map<String,Object> stringObjectMap = ThreadLocalUtil.get();
         String email = String.valueOf(stringObjectMap.get("email"));

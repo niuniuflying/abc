@@ -49,5 +49,3 @@ mybatis-plus:
 
 #     驼峰命名与下划线的转换
     map-underscore-to-camel-case: false
-
-

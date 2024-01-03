@@ -18,6 +18,7 @@ public class User {
     private String contact;
     private String avatar;
     private String reputation;
+    private String isAdmin;
     private String createTime;
     private String updateTime;
     private String isDelete;
