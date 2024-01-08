@@ -81,13 +81,19 @@ public class UserController {
 
     //注册时 忘记密码时 发送的验证码并存到Redis
     @PostMapping("/email/{email}")
-    public Result<String> sendMailAndSetRedis(@PathVariable String email){
-        String code = CodeUtils.code();
-        System.out.println("发送的验证码："+code);
-        iEmailService.sendCode(email,code);
-        iUserService.setRedisCode(email,code);
-        return new Result<>(200,"发送验证码并存入Redis","success");
+    public Result<String> sendMailAndSetRedis(@PathVariable String email) {
+        try {
+            String code = CodeUtils.code();
+            System.out.println("发送的验证码：" + code);
+            iEmailService.sendCode(email, code);
+            iUserService.setRedisCode(email, code);
+            return new Result<>(200, "发送验证码并存入Redis", "success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new Result<>(500, "发送验证码失败", "lose");
+        }
     }
+
 
 
     //邮箱发送验证码用于 忘记密码->重新设置修改密码
@@ -261,7 +267,7 @@ public class UserController {
         }
     }
 
-    //    修改头像(先删除原有的头像及地址 再重新上传头像和地址）
+/*    //    修改头像(先删除原有的头像及地址 再重新上传头像和地址）
     @PutMapping("/updateAvatar")
     public Result<String> updateAvatar(@RequestParam("img") MultipartFile file) throws Exception {
         Map<String,Object> stringObjectMap = ThreadLocalUtil.get();
@@ -290,9 +296,54 @@ public class UserController {
         }else {
             return new Result<>(200,"修改失败", null);
         }
+    }*/
+
+    //
+    @PutMapping("/addAvatar")
+    public Result<String> addAvatar(@RequestParam("img") MultipartFile file) throws Exception{
+        Map<String,Object> stringObjectMap = ThreadLocalUtil.get();
+        String email = String.valueOf(stringObjectMap.get("email"));
+        User user = iUserService.selectUserByEmail(email);
+        String avatar = user.getAvatar();
+        System.out.println("-----------"+avatar);
+        //如果此用户是第一次上传头像
+        if (avatar != null && !avatar.isEmpty()){
+            //先删除原有的头像再上传新头像
+            System.out.println("删除文件名称:"+avatar);
+            String newUrl=url+avatar;
+            File f=new File(newUrl);
+            if (f.exists()){
+                Path path= Paths.get(newUrl);
+                boolean flag = Files.deleteIfExists(path);
+                System.out.println("是否删除成功:"+flag);
+                if (flag){
+                    //调用上传图像方法
+                    Result<String> result = avatarUpload(file);
+                    Integer code = result.getCode();
+                    if (code==200){
+                        return new Result<>(200,"上传成功",result.getData());
+                    }else {
+                        return new Result<>(500,"上传失败", result.getData());
+                    }
+                }else {
+                    return new Result<>(500,"上传失败", null);
+                }
+            }else {
+                return new Result<>(500,"上传失败", null);
+            }
+        }else {
+            //调用上传图像方法
+            Result<String> result = avatarUpload(file);
+            Integer code = result.getCode();
+            if (code==200){
+                return new Result<>(200,"上传成功",result.getData());
+            }else {
+                return new Result<>(500,"上传失败", result.getData());
+            }
+        }
     }
 
-    //    下载图片
+/*    //    下载图片
     @GetMapping("/downloadAvatar")
     public Result<String> downloadAvatar(HttpServletResponse response)throws Exception{
         Map<String,Object> stringObjectMap = ThreadLocalUtil.get();
@@ -326,7 +377,7 @@ public class UserController {
             ips.close();
         }
         return null;
-    }
+    }*/
 
 
 }

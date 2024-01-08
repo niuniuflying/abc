@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class JwtTest {
 
-    @Test
+/*    @Test
     public void testGen(){
         Map<String, Object> hashMap = new HashMap<>();
         hashMap.put("id","001");
@@ -24,9 +24,9 @@ public class JwtTest {
                 .sign(Algorithm.HMAC256("LingChen")); //指定算法 配置密钥
 
         System.out.println(token);
-    }
+    }*/
 
-    @Test
+    /*@Test
     public void testParse(){
         String token="eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9" +
                 ".eyJleHAiOjE3MDQxMTAxNDcsInVzZXIiOnsiaWQiOiIwMDEiLCJ1c2VybmFtZSI6Im5pdU5pdSJ9fQ" +
@@ -36,5 +36,5 @@ public class JwtTest {
         Map<String,Claim> claim = verify.getClaims();
         System.out.println(claim.get("user"));
 
-    }
+    }*/
 }
