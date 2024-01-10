@@ -298,7 +298,7 @@ public class UserController {
         }
     }*/
 
-    //
+    //添加或修改头像
     @PutMapping("/addAvatar")
     public Result<String> addAvatar(@RequestParam("img") MultipartFile file) throws Exception{
         Map<String,Object> stringObjectMap = ThreadLocalUtil.get();

@@ -7,18 +7,13 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class Commodity {
+public class Feedback {
     private Integer id;
     private Integer userId;
-    private String name;
-    private String image;
-    private String price;
-    private String degree;
-    private String description;
-    private String type;
-    private String status;
+    private String email;
+    private String title;
+    private String text;
     private String createTime;
     private String updateTime;
-    private Integer outdated;
     private String isDelete;
 }
