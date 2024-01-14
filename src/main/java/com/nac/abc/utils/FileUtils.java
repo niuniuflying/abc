@@ -22,7 +22,7 @@ public class FileUtils {
 
         // 检查文件扩展名是否为.jpg或.png（不区分大小写）
         String fileExtension = FilenameUtils.getExtension(originalFilename);
-        if ("jpg".equalsIgnoreCase(fileExtension) || "png".equalsIgnoreCase(fileExtension)) {
+        if ("jpg".equalsIgnoreCase(fileExtension) || "png".equalsIgnoreCase(fileExtension) || "webp".equalsIgnoreCase(fileExtension)) {
             try {
                 // 设置新名称
 //                String newFilename = UUID.randomUUID() + "." + fileExtension;

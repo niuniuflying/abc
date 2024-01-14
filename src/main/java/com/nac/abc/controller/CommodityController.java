@@ -6,6 +6,7 @@ import com.nac.abc.entity.Result;
 import com.nac.abc.service.impl.CommodityServiceImpl;
 import com.nac.abc.utils.FileUtils;
 import com.nac.abc.utils.ThreadLocalUtil;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.security.auth.message.AuthStatus;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.List;
@@ -37,7 +39,8 @@ public class CommodityController {
     public Result<String> addCommodity(@RequestParam("img") MultipartFile file,@ModelAttribute Commodity commodity) throws IOException {
         Map<String,Object> stringObjectMap = ThreadLocalUtil.get();
         Integer userId = (Integer) stringObjectMap.get("id");
-        String userID = (String) stringObjectMap.get("id");
+        String userID = String.valueOf(userId);
+//        String userID = (String) stringObjectMap.get("id");
 
         //查看今天此用户是否已经发布三个商品 是->不许再次添加 否->允许添加
         stringRedisTemplate.opsForHash().increment(userID , "commodity", -1);
@@ -85,7 +88,7 @@ public class CommodityController {
     //修改商品 只能修改商品信息 不能修改图片
     @PutMapping("/updateCommodity")
     public Result<String> updateCommodity(@RequestBody Commodity commodity){
-        Commodity c = commodityService.selectOneCommodity(commodity);
+        Commodity c = commodityService.selectOneById(commodity.getId());
         String image = c.getImage();
         commodity.setImage(image);
         boolean b = commodityService.updateCommodity(commodity);

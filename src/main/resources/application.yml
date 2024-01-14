@@ -23,11 +23,17 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+  data:
+    mongodb:
+      uri: mongodb://localhost:27018/aaa
+
+  #  设置日期时间格式
+  jackson:
+    date-format: yyyy-MM-dd
 
 file:
   url: C:\\D\\file\\
   size: 1048576
-
 
 #修改端口号
 server:

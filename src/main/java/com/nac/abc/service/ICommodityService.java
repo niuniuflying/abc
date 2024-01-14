@@ -29,4 +29,6 @@ public interface ICommodityService extends IService<Commodity> {
 
     List<Commodity> getMyCommodity(Integer userId);
 
+    Commodity selectOneById(Integer id);
+
 }

@@ -104,6 +104,11 @@ public class CommodityServiceImpl extends ServiceImpl<CommodityMapper, Commodity
         return commodityMapper.selectList(queryWrapper);
     }
 
+    @Override
+    public Commodity selectOneById(Integer id) {
+        return commodityMapper.selectById(id);
+    }
+
     /*@Override
     public Commodity selectCommodityById(Integer id) {
         return commodityMapper.selectById(id);

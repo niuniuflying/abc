@@ -40,6 +40,7 @@ public class NewsServiceImpl extends ServiceImpl<NewsMapper, News> implements IN
     public News selectLatestNews() {
         QueryWrapper<News> wrapper = new QueryWrapper<>();
         wrapper.orderByDesc("createTime").last("LIMIT 1");
+        wrapper.eq("isDelete","0");
         return newsMapper.selectOne(wrapper);
     }
 
